@@ -3,6 +3,7 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
+import { vars } from 'nativewind';
 import { Platform } from 'react-native';
 
 const tintColorLight = '#0a7ea4';
@@ -26,6 +27,30 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+export const themes = {
+  brand: {
+    'light': vars({
+      '--color-primary': 'black',
+      '--color-secondary': 'white'
+    }),
+    'dark': vars({
+      '--color-primary': 'white',
+      '--color-secondary': 'dark'
+    })
+  },
+  christmas: {
+    'light': vars({
+      '--color-primary': 'red',
+      '--color-secondary': 'green'
+    }),
+    'dark': vars({
+      '--color-primary': 'green',
+      '--color-secondary': 'red'
+    })
+  }
+}
+ 
 
 export const Fonts = Platform.select({
   ios: {
