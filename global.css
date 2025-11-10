@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.textInput{
+    @apply px-4 py-3 border rounded-md border-slate-500 text-slate-500 dark:text-white;
+}
+
+.textInputTitle{
+    @apply mb-2 ml-1 font-semibold ;
+}

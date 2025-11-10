@@ -8,6 +8,7 @@ export default function AuthLayout() {
         headerStyle: { backgroundColor: "#1a2c33" },
         headerTintColor: "#41e8c0",
         headerTitleAlign: "center",
+        headerShown: false,
       }}
     >
       <Stack.Screen 
