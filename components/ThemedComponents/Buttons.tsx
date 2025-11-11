@@ -10,7 +10,7 @@ import {
 
 // Button Component
 interface ThemedButtonProps extends PressableProps {
-  children: ReactNode;
+  children?: ReactNode;
   style?: StyleProp<ViewStyle>;
   href?: Href;
   className?:string,
@@ -65,7 +65,7 @@ export const ThemedButton = ({
 
   return (
     <Pressable
-      className={`${getVariantStyles()} active:outline outline-offset-2 ${className}`}
+      className={`${getVariantStyles()} active:outline outline-offset-2 max-w-lg w-full self-center ${className}`}
       style={style}
       onPress={handlePress}
       {...props}

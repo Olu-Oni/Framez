@@ -48,7 +48,7 @@ export default function Login() {
     //   contentContainerClassName="flex-grow"
     //   className="bg-[#1a2c33]"
     // >
-    <ThemedMainContainer className="justify-center flex-1 px-6 py-12 bg-white dark:bg-black">
+    <ThemedMainContainer className="items-center justify-center flex-1 px-6 py-12 bg-white dark:bg-black">
       {/* Header */}
       <View className="mb-8">
         <ThemedMainHeading className="mb-2 text-center">
@@ -58,7 +58,7 @@ export default function Login() {
       </View>
 
       {/* Form */}
-      <View className="mb-6">
+      <View className="w-full max-w-lg mb-6 lg:mt-10 ">
         {/* Email Input */}
         <View className="mb-4">
           <ThemedText className="textInputTitle">Email</ThemedText>
@@ -110,7 +110,7 @@ export default function Login() {
       </ThemedButton>
 
       {/* Divider */}
-      <View className="flex-row items-center my-6">
+      <View className="flex-row items-center self-center w-full max-w-lg my-6">
         <View className="flex-1 h-[1px] bg-[#3d5359]" />
         <ThemedText className="text-[#7d9ca3] mx-4">or</ThemedText>
         <View className="flex-1 h-[1px] bg-[#3d5359]" />
