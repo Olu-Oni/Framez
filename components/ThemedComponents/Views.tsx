@@ -8,7 +8,7 @@ interface ThemedViewProps extends ViewProps {
 
 export const ThemedCard = ({ children, style, ...props }: ThemedViewProps) => {
   return (
-    <View className="bg-white dark:bg-black" style={style} {...props}>
+    <View className="p-4 bg-white dark:bg-black" style={style} {...props}>
       {children}
     </View>
   );

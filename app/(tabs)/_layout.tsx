@@ -1,19 +1,25 @@
 import { ThemedMainContainer } from "@/components/ThemedComponents/Views";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
-import { Redirect, Tabs } from "expo-router";
+import { Redirect, Tabs, useRouter } from "expo-router";
 import React from "react";
-import { ActivityIndicator } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+
 export default function TabLayout() {
-  //   const colorScheme = useColorScheme();
   const user = useQuery(api.lib.users.getCurrentUser);
+  const router = useRouter();
 
   console.log("Auth State:", {
     loading: user === undefined,
     authenticated: user !== null,
     user: user,
   });
-  
+
   // Loading state
   if (user === undefined) {
     return (
@@ -30,30 +36,89 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={
-        {
-          // tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-          // headerShown: false,
-          // tabBarButton: HapticTab,
-        }
-      }
+      screenOptions={{
+        tabBarActiveTintColor: "#41e8c0",
+        headerShown: true,
+      }}
     >
       <Tabs.Protected guard={!!user}>
         <Tabs.Screen
           name="index"
           options={{
             title: "Feed",
-            //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+            headerTitleAlign: "center",
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => router.push("/(modals)/createPostModal")}
+                style={styles.headerButton}
+              >
+                <Image
+                  style={styles.icon}
+                  source={require("@/assets/post-icon.png")}
+                />
+              </TouchableOpacity>
+            ),
+            tabBarIcon: ({ color, focused }) => (
+              <Image
+                style={[styles.tabIcon, { tintColor: color }]}
+                source={require("@/assets/post-icon.png")} // Add a home icon
+              />
+            ),
           }}
         />
+
         <Tabs.Screen
           name="profile"
           options={{
             title: "Profile",
-            //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+            tabBarIcon: ({ color, focused }) => (
+              <Image
+                style={[styles.tabIcon, { tintColor: color }]}
+                source={require("@/assets/blank-avatar.png")}
+              />
+            ),
           }}
+        />
+        <Tabs.Screen
+          name="/(modals)/createPostModal"
+          options={{
+            href:"/(modals)/createPostModal",
+            title: "create",
+            tabBarIcon: ({ color, focused }) => (
+              <Image
+                style={[
+                  styles.tabIcon,
+                  { tintColor: focused ? "#41e8c0" : color }
+                ]}
+                source={require("@/assets/post-icon.png")}
+              />
+            ),
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              router.push("/(modals)/createPostModal");
+            },
+          })}
         />
       </Tabs.Protected>
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  icon: {
+    width: 30,
+    height: 30,
+    resizeMode: "contain", // Better than borderRadius for icons
+  },
+  headerButton: {
+    marginRight: 16,
+    padding: 4, // Adds touchable area
+  },
+  tabIcon: {
+    width: 24,
+    height: 24,
+    resizeMode: "contain",
+  },
+});

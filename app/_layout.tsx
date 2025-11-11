@@ -34,6 +34,13 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ title: "Home" }} />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="(modals)"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        
       </Stack>
     </ConvexAuthProvider>
   );

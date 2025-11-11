@@ -21,6 +21,7 @@ const schema = defineSchema({
     content: v.string(),
     imageUrls: v.optional(v.array(v.string())),
     createdAt: v.number(),
+    likes:v.number(),
   }).index("by_user", ["userId"]),
 });
 
