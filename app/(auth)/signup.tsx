@@ -31,22 +31,34 @@ export default function Signup() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSignup = async () => {
-    if (!fullName || !userName || !email || !password || !confirmPassword) {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const trimmedConfirmPassword = confirmPassword.trim();
+    const trimmedFullName = fullName.trim();
+    const trimmedUserName = userName.trim();
+
+    if (
+      !trimmedFullName ||
+      !trimmedUserName ||
+      !trimmedEmail ||
+      !trimmedPassword ||
+      !trimmedConfirmPassword
+    ) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
-    if (fullName.length < 2) {
+    if (trimmedFullName.length < 2) {
       Alert.alert("Error", "Full name must be at least 2 characters");
       return;
     }
 
-    if (userName.length < 3 || userName.length > 20) {
+    if (trimmedUserName.length < 3 || trimmedUserName.length > 20) {
       Alert.alert("Error", "Username must be between 3 and 20 characters");
       return;
     }
 
-    if (!/^[a-zA-Z0-9_]+$/.test(userName)) {
+    if (!/^[a-zA-Z0-9_]+$/.test(trimmedUserName)) {
       Alert.alert(
         "Error",
         "Username can only contain letters, numbers, and underscores"
@@ -54,44 +66,58 @@ export default function Signup() {
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (trimmedPassword !== trimmedConfirmPassword) {
       Alert.alert("Error", "Passwords don't match");
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters");
+    if (trimmedPassword.length < 8) {
+      Alert.alert("Error", "Password must be at least 8 characters");
       return;
     }
 
-    if (!/[0-9]/.test(password)) {
+    if (!/[0-9]/.test(trimmedPassword)) {
       Alert.alert("Error", "Password must contain at least one number");
       return;
     }
 
     setLoading(true);
     console.log({
-        email,
-        password,
-        fullName,
-        userName,
-        flow: "signUp",
-      })
+      email: trimmedEmail,
+      password: "***",
+      fullName: trimmedFullName,
+      userName: trimmedUserName,
+      flow: "signUp",
+    });
     try {
       await signIn("password", {
-        email,
-        password,
-        fullName,
-        userName,
+        email: trimmedEmail,
+        password: trimmedPassword,
+        fullName: trimmedFullName,
+        userName: trimmedUserName,
         flow: "signUp",
       });
       router.replace("/(tabs)"); // Navigate to main app
-    } catch (error) {
+    } catch (error: any) {
+      const message = String(error?.message || "").toLowerCase();
       console.error("Signup error:", error);
-      Alert.alert(
-        "Signup Failed",
-        "Unable to create account. Email may already be in use."
-      );
+
+      if (message.includes("invalid password")) {
+        Alert.alert(
+          "Account exists",
+          "This email is already registered. Please log in or reset your password."
+        );
+      } else if (message.includes("already") && message.includes("exist")) {
+        Alert.alert(
+          "Account exists",
+          "An account with this email already exists. Please log in."
+        );
+      } else {
+        Alert.alert(
+          "Signup Failed",
+          "Unable to create account. Email may already be in use."
+        );
+      }
     } finally {
       setLoading(false);
     }
