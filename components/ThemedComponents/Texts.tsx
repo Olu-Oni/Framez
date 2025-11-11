@@ -26,7 +26,7 @@ const createThemedText = (baseClassName: string) => {
 // Export themed text variants
 export const ThemedText = createThemedText("text-slate-500 dark:text-white");
 export const ThemedMainHeading = createThemedText(
-  "text-[#41e8c0] font-bold text-5xl"
+  "text-[#41e8c0] font-bold text-3xl lg:text-5xl "
 );
 export const ThemedSubHeading = createThemedText(
   "text-[#0d8166] font-semibold dark:text-white text-3xl"

@@ -3,21 +3,24 @@ import {
   ThemedCard,
   ThemedMainContainer,
 } from "@/components/ThemedComponents/Views";
+import { Post } from "@/convex/schema";
 import React, { useEffect, useMemo, useState } from "react";
-import { Image, ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 
-import Carousel from "react-native-reanimated-carousel";
+import Carousel, {
+  ICarouselInstance,
+  Pagination,
+} from "react-native-reanimated-carousel";
 
 // Define the Post type
-type Post = {
-  userId: string;
-  userName: string;
-  userAvatar?: string;
-  content: string;
-  imageUrls?: string[];
-  createdAt: number;
-  likes: number;
-};
+
 
 const Feed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -49,49 +52,50 @@ const Feed = () => {
   }, []); // Empty dependency array - runs only once
 
   return (
-    <ScrollView>
-      <ThemedMainContainer className="gap-1 p-2">
-        {posts.map(
-          (
-            post,
-            index // Changed 'posts' to 'post' and added index
-          ) => (
-            <ThemedCard key={`${post.userId}-${index}`}>
-              {" "}
-              {/* Added unique key */}
-              {/* Profile Header */}
-              <View style={styles.headerContainer}>
-                <Image
-                  alt="profile icon"
-                  source={
-                    post.userAvatar
-                      ? { uri: post.userAvatar }
-                      : require("@/assets/blank-avatar.png")
-                  }
-                  style={styles.avatar}
-                />
-                <View style={styles.userInfo}>
-                  <ThemedText style={styles.userName}>
-                    {post.userName}
-                  </ThemedText>
-                  <ThemedText style={styles.timestamp}>
-                    {new Date(post.createdAt).toLocaleDateString()}
-                  </ThemedText>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <ThemedMainContainer className="p-2">
+        {/* Post Container */}
+        <View className="items-center flex-1 gap-1">
+          {posts.map(
+            (
+              post,
+              index // Changed 'posts' to 'post' and added index
+            ) => (
+              <ThemedCard key={`${post.userId}-${index}`}>
+                 {/* Profile Header */}
+                <View style={styles.headerContainer}>
+                  <Image
+                    alt="profile icon"
+                    source={
+                      post.userAvatar
+                        ? { uri: post.userAvatar }
+                        : require("@/assets/blank-avatar.png")
+                    }
+                    style={styles.avatar}
+                  />
+                  <View style={styles.userInfo}>
+                    <ThemedText style={styles.userName}>
+                      {post.userName}
+                    </ThemedText>
+                    <ThemedText style={styles.timestamp}>
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </ThemedText>
+                  </View>
                 </View>
-              </View>
-              {/* Post Content */}
-              <ThemedText style={styles.content}>{post.content}</ThemedText>
-              {/* Post Images */}
-              {post.imageUrls && post.imageUrls.length > 0 && (
-                <PostImageCarousel imageUrls={post.imageUrls} />
-              )}
-              {/* Likes */}
-              <ThemedText style={styles.likes}>
-                ❤️ {post.likes} likes
-              </ThemedText>
-            </ThemedCard>
-          )
-        )}
+                {/* Post Content */}
+                <ThemedText style={styles.content}>{post.content}</ThemedText>
+                {/* Post Images */}
+                {post.imageUrls && post.imageUrls.length > 0 && (
+                  <PostImageCarousel imageUrls={post.imageUrls} />
+                )}
+                {/* Likes */}
+                <ThemedText style={styles.likes}>
+                  ❤️ {post.likes} likes
+                </ThemedText>
+              </ThemedCard>
+            )
+          )}
+        </View>
       </ThemedMainContainer>
     </ScrollView>
   );
@@ -99,36 +103,58 @@ const Feed = () => {
 
 function PostImageCarousel({ imageUrls }: { imageUrls: string[] }) {
   const { width } = useWindowDimensions();
+  const itemWidth = useMemo(() => Math.min(width - 50, 600), [width - 50]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const itemWidth = useMemo(() => Math.min(width, 800), [width]);
+  // const itemWidth = Dimensions.get("window").width ;
+  const ref = React.useRef<ICarouselInstance>(null);
+  const progress = useSharedValue<number>(0);
+
+  const onPressPagination = (index: number) => {
+    ref.current?.scrollTo({
+      /**
+       * Calculate the difference between the current index and the target index
+       * to ensure that the carousel scrolls to the nearest index
+       */
+      count: index - progress.value,
+      animated: true,
+    });
+  };
 
   return (
-    <View style={[styles.carouselContainer, { width: "100%" }]}>
+    <View
+      style={[styles.carouselContainer, { width: "100%" }]}
+      className="self-center mx-auto"
+    >
       <Carousel
         width={itemWidth}
-        height={200}
+        height={itemWidth / 1.5}
         data={imageUrls}
         loop={false}
+        onProgressChange={progress}
         pagingEnabled
-        onSnapToItem={setActiveIndex}
+        // onSnapToItem={setActiveIndex}
         renderItem={({ item }: { item: string }) => (
-          <View style={{ width: itemWidth }}>
+          <View
+            style={{
+              flex: 1,
+              // borderWidth: 1,
+              justifyContent: "center",
+              padding: 4,
+            }}
+          >
             <Image source={{ uri: item }} style={[styles.postImage]} />
           </View>
         )}
       />
 
-      <View style={styles.dotsContainer}>
-        {imageUrls.map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.dot,
-              i === activeIndex ? styles.dotActive : styles.dotInactive,
-            ]}
-          />
-        ))}
-      </View>
+      <Pagination.Basic
+        progress={progress}
+        data={imageUrls}
+        dotStyle={{ backgroundColor: "rgba(0,0,0,0.2)", borderRadius: 50 }}
+        activeDotStyle={{ backgroundColor: "#41e8c0", borderRadius: 50 }}
+        containerStyle={{ gap: 5, marginTop: 10 }}
+        onPress={onPressPagination}
+      />
     </View>
   );
 }
@@ -137,7 +163,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 16,
   },
   avatar: {
     width: 40,
@@ -164,7 +190,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: "100%",
-    height: 200,
+    height: 300,
     borderRadius: 8,
   },
   carouselContainer: {

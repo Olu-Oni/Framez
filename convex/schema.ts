@@ -26,3 +26,13 @@ const schema = defineSchema({
 });
 
 export default schema;
+
+export type Post = {
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  content: string;
+  imageUrls?: string[];
+  createdAt: number;
+  likes: number;
+};

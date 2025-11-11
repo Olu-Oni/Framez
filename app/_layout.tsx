@@ -3,6 +3,7 @@ import { ConvexReactClient } from "convex/react";
 import { Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
   unsavedChangesWarning: false,
 });
@@ -15,33 +16,34 @@ const secureStorage = {
 
 export default function RootLayout() {
   return (
-    <ConvexAuthProvider
-      client={convex}
-      storage={
-        Platform.OS === "android" || Platform.OS === "ios"
-          ? secureStorage
-          : undefined
-      }
-    >
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: "transparent" },
-          headerTitleAlign: "center",
-          headerTintColor: "#41e8c0",
-          headerShown: false,
-        }}
+    <GestureHandlerRootView>
+      <ConvexAuthProvider
+        client={convex}
+        storage={
+          Platform.OS === "android" || Platform.OS === "ios"
+            ? secureStorage
+            : undefined
+        }
       >
-        <Stack.Screen name="index" options={{ title: "Home" }} />
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="(modals)"
-          options={{
-            presentation: "modal",
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: "transparent" },
+            headerTitleAlign: "center",
+            headerTintColor: "#41e8c0",
+            headerShown: false,
           }}
-        />
-        
-      </Stack>
-    </ConvexAuthProvider>
+        >
+          <Stack.Screen name="index" options={{ title: "Home" }} />
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="(modals)"
+            options={{
+              presentation: "modal",
+            }}
+          />
+        </Stack>
+      </ConvexAuthProvider>
+    </GestureHandlerRootView>
   );
 }
