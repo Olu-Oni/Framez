@@ -10,3 +10,7 @@
 .textInputTitle{
     @apply mb-2 ml-1 font-semibold ;
 }
+
+.mainContainer{
+    @apply flex-1 bg-white dark:bg-black;
+}

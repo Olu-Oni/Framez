@@ -68,6 +68,27 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
+          name="create"
+          options={{
+            title: "New Post",
+            tabBarIcon: ({ color, focused }) => (
+              <Image
+                style={[
+                  styles.tabIcon,
+                  { tintColor: focused ? "#41e8c0" : color },
+                ]}
+                source={require("@/assets/post-icon.png")}
+              />
+            ),
+          }}
+          listeners={() => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              router.push("/(modals)/createPostModal");
+            },
+          })}
+        />
+        <Tabs.Screen
           name="profile"
           options={{
             title: "Profile",
@@ -78,28 +99,6 @@ export default function TabLayout() {
               />
             ),
           }}
-        />
-        <Tabs.Screen
-          name="/(modals)/createPostModal"
-          options={{
-            href:"/(modals)/createPostModal",
-            title: "create",
-            tabBarIcon: ({ color, focused }) => (
-              <Image
-                style={[
-                  styles.tabIcon,
-                  { tintColor: focused ? "#41e8c0" : color }
-                ]}
-                source={require("@/assets/post-icon.png")}
-              />
-            ),
-          }}
-          listeners={({ navigation }) => ({
-            tabPress: (e) => {
-              e.preventDefault();
-              router.push("/(modals)/createPostModal");
-            },
-          })}
         />
       </Tabs.Protected>
     </Tabs>

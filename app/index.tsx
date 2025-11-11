@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Page = () => {
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-black">
+    <SafeAreaView className="mainContainer">
       <ThemedMainContainer>
         {/* Hero Section */}
         <View className="items-center justify-center flex-1 px-6">
