@@ -20,7 +20,7 @@ const Feed = () => {
   // Loading state
   if (posts === undefined) {
     return (
-      <ThemedMainContainer className="items-center justify-center flex-1">
+      <ThemedMainContainer className="items-center justify-center mainContainer">
         <ActivityIndicator size="large" color="#41e8c0" />
       </ThemedMainContainer>
     );
@@ -28,7 +28,7 @@ const Feed = () => {
   // Empty state
   if (posts.length == 0) {
     return (
-      <ThemedMainContainer className="items-center justify-center flex-1 gap-10 p-10">
+      <ThemedMainContainer className="items-center justify-center gap-10 p-10 mainContainer">
         <ThemedText className="text-2xl font-bold">No posts found</ThemedText>
         <ThemedButton
           variant="primary"

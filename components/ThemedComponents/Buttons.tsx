@@ -14,7 +14,7 @@ interface ThemedButtonProps extends PressableProps {
   style?: StyleProp<ViewStyle>;
   href?: Href;
   className?:string,
-  variant?: "primary" | "secondary" | "outline" | "ghost";
+  variant?: "primary" | "secondary" | "outline" | "ghost" |"red";
 }
 
 export const ThemedButton = ({
@@ -37,6 +37,8 @@ export const ThemedButton = ({
         return "border-2 border-[#41e8c0] active:bg-[#41e8c0]/10 px-6 py-3 rounded-md";
       case "ghost":
         return "active:bg-[#41e8c0]/10 px-6 py-3 rounded-md";
+      case "red":
+        return "active:bg-[#ef4444]/10 px-6 py-3 rounded-md";
       default:
         return "bg-[#41e8c0] px-6 py-3 rounded-md";
     }
@@ -52,6 +54,8 @@ export const ThemedButton = ({
         return "text-[#41e8c0]"; // Accent color text
       case "ghost":
         return "text-[#41e8c0]"; // Accent color text
+      case "red":
+        return "text-[#ef4444]"; // Accent color text
       default:
         return "text-[#1a2c33]";
     }
@@ -65,7 +69,7 @@ export const ThemedButton = ({
 
   return (
     <Pressable
-      className={`${getVariantStyles()} active:outline outline-offset-2 max-w-lg w-full self-center ${className}`}
+      className={`${getVariantStyles()} focus:outline-[#41e8c0] outline-offset-4 max-w-lg w-full self-center ${className}`}
       style={style}
       onPress={handlePress}
       {...props}

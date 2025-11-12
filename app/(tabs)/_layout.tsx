@@ -51,6 +51,7 @@ export default function TabLayout() {
           options={{
             title: "Feed",
             tabBarStyle:{backgroundColor:theme==='dark'?'black':'white',borderTopColor:theme==='dark'?'black':'white'},
+            headerTintColor:(theme==='dark'?'#41e8c0':'black'),
             headerTitleAlign: "center",
             headerRight: () => (
               <TouchableOpacity
@@ -98,6 +99,7 @@ export default function TabLayout() {
           name="profile"
           options={{
             title: "Profile",
+            headerTintColor:(theme==='dark'?'#41e8c0':'black'),
             tabBarStyle:{backgroundColor:theme==='dark'?'black':'white',borderTopColor:theme==='dark'?'black':'white'},
             
             tabBarIcon: ({ color, focused }) => (

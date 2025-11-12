@@ -6,6 +6,7 @@ import {
   ThemedText,
 } from "@/components/ThemedComponents/Texts";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import * as ImagePicker from "expo-image-picker";
 import { Link, router } from "expo-router";
@@ -26,32 +27,68 @@ import {
 export default function CreatePost() {
   const isPresented = router.canGoBack();
   const [postContent, setPostContent] = useState<string>("");
-  const [postImages, setImages] = useState<string[]>([]);
+  // const [postImages, setImages] = useState<string[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // For UI
+  const [imageFiles, setImageFiles] = useState<
+    {
+      uri: string;
+      type: string;
+      name: string;
+    }[]
+  >([]); // For upload
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const generateUploadUrl = useMutation(api.lib.images.generateUploadUrl);
 
   const createPost = useMutation(api.lib.posts.createPost);
 
-  const removeImage = (indexToRemove: number) => {
-    setImages(postImages.filter((_, index) => index !== indexToRemove));
+  const removeImage = (index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleCreation = async () => {
-    if (!postContent.trim()) {
-      return;
-    }
+    if (!postContent.trim()) return;
 
     setIsLoading(true);
     try {
+      const uploadedStorageIds: Id<"_storage">[] = [];
+
+      // Upload each image
+      for (const file of imageFiles) {
+        const uploadUrl = await generateUploadUrl();
+
+        const response = await fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": file.type,
+          },
+          body: { uri: file.uri, type: file.type, name: file.name } as any,
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(`Upload failed: ${error}`);
+        }
+
+        const { storageId } = await response.json();
+        uploadedStorageIds.push(storageId);
+      }
+
+      // Create post with storage IDs
       await createPost({
         content: postContent.trim(),
-        imageUrls: postImages,
+        imageUrls: uploadedStorageIds, // Convex storage IDs
       });
-      // Reset form and navigate back
+
+      // Reset
       setPostContent("");
-      setImages([]);
+      setImageFiles([]);
+      setPreviewUrls([]);
       router.back();
-    } catch (error) {
-      console.error("Error creating post:", error);
+    } catch (error: any) {
+      console.error("Post creation failed:", error);
+      Alert.alert("Error", error.message || "Failed to create post");
     } finally {
       setIsLoading(false);
     }
@@ -61,36 +98,27 @@ export default function CreatePost() {
     // Request camera permissions
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Camera Permission Required",
-        "Please grant camera permissions in your device settings to take photos."
-      );
+      Alert.alert("Permission required", "Camera access is needed.");
       return;
     }
 
     let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.7, // Reduced from 1.0 for better file size (0.7 = 70% quality)
-      allowsMultipleSelection: false,
+      quality: 0.7,
     });
 
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
-      // Limit image dimensions to prevent huge files
-      // Most social media apps use max 1080-1920px width
-      const maxWidth = 1920;
-      const maxHeight = 1920;
+      const file = {
+        uri: asset.uri,
+        type: asset.mimeType || "image/jpeg",
+        name: asset.fileName || `photo-${Date.now()}.jpg`,
+      };
 
-      // If image is larger than max dimensions, we'd need expo-image-manipulator
-      // For now, quality reduction helps significantly
-      if (asset.width && asset.height) {
-        // Log for debugging
-        console.log(`Image dimensions: ${asset.width}x${asset.height}`);
-      }
-
-      setImages([...postImages, asset.uri]);
+      setImageFiles((prev) => [...prev, file]);
+      setPreviewUrls((prev) => [...prev, asset.uri]);
     }
   };
 
@@ -106,47 +134,28 @@ export default function CreatePost() {
     // }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 0.7,
-      allowsMultipleSelection: false,
-      // Platform-specific optimizations
-      ...(Platform.OS === "ios" && {
-        // iOS-specific options
-        exif: false, // Remove EXIF data to reduce file size
-      }),
     });
 
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
+      const file = {
+        uri: asset.uri,
+        type: asset.mimeType || "image/jpeg",
+        name: asset.fileName || `image-${Date.now()}.jpg`,
+      };
 
-      // Check file size if available (some platforms provide this)
-      if (asset.fileSize) {
-        const maxSizeMB = 10; // 10MB limit
-        const fileSizeMB = asset.fileSize / (1024 * 1024);
-
-        if (fileSizeMB > maxSizeMB) {
-          Alert.alert(
-            "Image Too Large",
-            `Image is ${fileSizeMB.toFixed(1)}MB. Please choose a smaller image (max ${maxSizeMB}MB).`
-          );
-          return;
-        }
-      }
-
-      // Log for debugging
-      if (asset.width && asset.height) {
-        console.log(`Image dimensions: ${asset.width}x${asset.height}`);
-      }
-
-      setImages([...postImages, asset.uri]);
+      setImageFiles((prev) => [...prev, file]);
+      setPreviewUrls((prev) => [...prev, asset.uri]);
     }
   };
 
   return (
     <ScrollView className="flex-1 mainContainer">
-      <Pressable className="flex-1" onPress={Keyboard.dismiss}>
+      <Pressable className="flex-1" onPress={Platform.OS !== "web" ? Keyboard.dismiss : undefined}>
         <View className="items-center flex-1 p-10 pl-4">
           {isPresented && (
             <View className="mb-4 ml-auto">
@@ -195,19 +204,17 @@ export default function CreatePost() {
                   </ThemedButton>
                 )}
               </View>
-              {postImages.length > 0 && (
+              {previewUrls.length > 0 && (
                 <View className="w-full mt-3">
                   <ThemedSubHeading2 className="mb-3 text-xl font-bold">
-                    Preview {postImages.length > 1 && `(${postImages.length})`}:
+                    Preview ({previewUrls.length}):
                   </ThemedSubHeading2>
-                  <View className="gap-3">
-                    <PostImageCarousel
-                      imageUrls={postImages}
-                      containerPadding={4}
-                      maxWidth={600}
-                      deleteFunction={removeImage}
-                    />
-                  </View>
+                  <PostImageCarousel
+                    imageUrls={previewUrls}
+                    containerPadding={4}
+                    maxWidth={600}
+                    deleteFunction={removeImage}
+                  />
                 </View>
               )}
             </View>
