@@ -8,9 +8,11 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  useColorScheme,
 } from "react-native";
 
 export default function TabLayout() {
+  const theme = useColorScheme()
   const user = useQuery(api.lib.users.getCurrentUser);
   const router = useRouter();
 
@@ -39,6 +41,8 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#41e8c0",
         headerShown: true,
+        headerStyle:{backgroundColor:theme==='dark'?'black':'white'}
+        
       }}
     >
       <Tabs.Protected guard={!!user}>
@@ -46,10 +50,11 @@ export default function TabLayout() {
           name="index"
           options={{
             title: "Feed",
+            tabBarStyle:{backgroundColor:theme==='dark'?'black':'white',borderTopColor:theme==='dark'?'black':'white'},
             headerTitleAlign: "center",
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => router.push("/(modals)/createPostModal")}
+                onPress={() => router.push("/(modals)/createPost")}
                 style={styles.headerButton}
               >
                 <Image
@@ -71,6 +76,7 @@ export default function TabLayout() {
           name="create"
           options={{
             title: "New Post",
+            
             tabBarIcon: ({ color, focused }) => (
               <Image
                 style={[
@@ -92,6 +98,8 @@ export default function TabLayout() {
           name="profile"
           options={{
             title: "Profile",
+            tabBarStyle:{backgroundColor:theme==='dark'?'black':'white',borderTopColor:theme==='dark'?'black':'white'},
+            
             tabBarIcon: ({ color, focused }) => (
               <Image
                 style={[styles.tabIcon, { tintColor: color }]}

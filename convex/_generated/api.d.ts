@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as lib_authValidation from "../lib/authValidation.js";
+import type * as lib_posts from "../lib/posts.js";
 import type * as lib_users from "../lib/users.js";
 
 import type {
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
   "lib/authValidation": typeof lib_authValidation;
+  "lib/posts": typeof lib_posts;
   "lib/users": typeof lib_users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

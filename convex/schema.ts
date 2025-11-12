@@ -22,7 +22,7 @@ const schema = defineSchema({
     imageUrls: v.optional(v.array(v.string())),
     createdAt: v.number(),
     likes:v.number(),
-  }).index("by_user", ["userId"]),
+  }).index("by_user", ["userId"]).index("by_createdAt", ["createdAt"]),
 });
 
 export default schema;

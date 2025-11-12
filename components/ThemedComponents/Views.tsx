@@ -2,13 +2,14 @@ import { ReactNode } from "react";
 import { StyleProp, StyleSheet, View, ViewProps, ViewStyle } from "react-native";
 
 interface ThemedViewProps extends ViewProps {
+  className?:string;
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
-export const ThemedCard = ({ children, style, ...props }: ThemedViewProps) => {
+export const ThemedCard = ({ className,children, style, ...props }: ThemedViewProps) => {
   return (
-    <View className="max-w-[640px] w-full p-4 bg-white dark:bg-black" style={style} {...props}>
+    <View className={`max-w-[640px] w-full p-4 ${className}`} style={style} {...props}>
       {children}
     </View>
   );
